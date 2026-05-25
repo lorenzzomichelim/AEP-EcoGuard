@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoGuard — Painel de Monitoramento Ambiental</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Ícones (Font Awesome) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      /* =============================================================
+         style.css — EcoGuard: Painel de Monitoramento Ambiental
+         AEP – ADS / Engenharia de Software | ODS 11 & ODS 15
+         Técnicas: CSS3, Flexbox, Grid, Custom Properties, Animations
+         ============================================================= */
+
+      /* ── 1. RESET & VARIÁVEIS GLOBAIS ──────────────────────────── */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        /* Paleta de cores — tema escuro ambiental */
+        --bg-base:        #0d1117;
+        --bg-surface:     #161b22;
+        --bg-surface2:    #1c2230;
+        --bg-card:        #21262d;
+        --bg-card-hover:  #2a3140;
+
+        --border:         #30363d;
+        --border-light:   #3d4451;
+
+        /* Cores semânticas */
+        --green:          #3fb950;
+        --green-dim:      #238636;
+        --green-glow:     rgba(63, 185, 80, 0.25);
+
+        --red:            #f85149;
+        --red-dim:        #da3633;
+        --red-glow:       rgba(248, 81, 73, 0.30);
+
+        --yellow:         #e3b341;
+        --yellow-glow:    rgba(227, 179, 65, 0.25);
+
+        --blue:           #58a6ff;
+        --blue-dim:       #1f6feb;
+        --blue-glow:      rgba(88, 166, 255, 0.25);
+
+        --orange:         #f0883e;
+        --purple:         #bc8cff;
+
+        --ods11:          #fca311;
+        --ods15:          #52b788;
+
+        /* Texto */
+        --text-primary:   #e6edf3;
+        --text-secondary: #8b949e;
+        --text-muted:     #484f58;
+
+        /* Tipografia */
+        --font-main: 'Inter', system-ui, sans-serif;
+        --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+        /* Espaçamentos */
+        --gap-sm:  0.5rem;
+        --gap-md:  1rem;
+        --gap-lg:  1.5rem;
+        --gap-xl:  2rem;
+
+        /* Bordas arredondadas */
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 14px;
+        --radius-xl: 20px;
+
+        /* Sombras */
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+        --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
+
+        /* Transições */
+        --transition: all 0.25s ease;
+      }
+
+      html { font-size: 16px; scroll-behavior: smooth; }
+
+      body {
+        font-family: var(--font-main);
+        background-color: var(--bg-base);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.6;
+      }
+
+      /* ── 2. TOPBAR ──────────────────────────────────────────── */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--gap-md);
+        padding: 0.85rem var(--gap-xl);
+        background-color: var(--bg-surface);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: var(--shadow-md);
+      }
+
+      .topbar__brand {
+        display: flex;
+        align-items: center;
+        gap: var(--gap-md);
+      }
+
+      .topbar__logo-wrap {
+        width: 42px;
+        height: 42px;
+        border-radius: var(--radius-md);
+        background: linear-gradient(135deg, #1a6b2f, #3fb950);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: #fff;
+        box-shadow: 0 0 12px var(--green-glow);
+        flex-shrink: 0;
+      }
+
+      .topbar__title {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: var(--text-primary);
+      }
+
+      .topbar__subtitle {
+        display: block;
+        font-size: 0.72rem;
+        color: var(--text-secondary);
+        letter-spacing: 0.3px;
+      }
+
+      .topbar__badges {
+        display: flex;
+        gap: var(--gap-sm);
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 99px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .badge--ods11 {
+        background: rgba(252, 163, 17, 0.15);
+        color: var(--ods11);
+        border: 1px solid rgba(252, 163, 17, 0.35);
+      }
+
+      .badge--ods15 {
+        background: rgba(82, 183, 136, 0.15);
+        color: var(--ods15);
+        border: 1px solid rgba(82, 183, 136, 0.35);
+      }
+
+      .topbar__clock {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        color: var(--blue);
+        background: rgba(88, 166, 255, 0.08);
+        padding: 6px 14px;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(88, 166, 255, 0.2);
+      }
+
+      /* ── 3. BARRA DE ESTATÍSTICAS ───────────────────────────── */
+      .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--gap-md);
+        padding: var(--gap-md) var(--gap-xl);
+        background-color: var(--bg-surface);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .stat-card {
+        display: flex;
+        align-items: center;
+        gap: var(--gap-md);
+        background: var(--bg-card);
+        padding: 0.85rem 1.1rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        transition: var(--transition);
+      }
+
+      .stat-card:hover {
+        background: var(--bg-card-hover);
+        transform: translateY(-1px);
+      }
+
+      .stat-card__icon {
+        font-size: 1.4rem;
+        width: 38px;
+        height: 38px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .stat-card__icon--blue   { color: var(--blue);   background: rgba(88, 166, 255, 0.12); }
+      .stat-card__icon--yellow { color: var(--yellow);  background: rgba(227, 179, 65, 0.12); }
+      .stat-card__icon--red    { color: var(--red);     background: rgba(248, 81, 73, 0.12);  }
+      .stat-card__icon--green  { color: var(--green);   background: rgba(63, 185, 80, 0.12);  }
+
+      .stat-card__label {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        font-weight: 500;
+      }
+
+      .stat-card__value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        font-family: var(--font-mono);
+        line-height: 1.1;
+      }
+
+      /* ── 4. GRID PRINCIPAL ──────────────────────────────────── */
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--gap-lg);
+        padding: var(--gap-lg) var(--gap-xl);
+        flex: 1;
+      }
+
+      .col-left,
+      .col-right {
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-lg);
+      }
+
+      /* ── 5. PAINÉIS ─────────────────────────────────────────── */
+      .panel {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .panel__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-surface2);
+        flex-wrap: wrap;
+        gap: var(--gap-sm);
+      }
+
+      .panel__title {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .panel__title i { color: var(--blue); }
+
+      .panel__subtitle {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        font-weight: 400;
+        font-family: var(--font-mono);
+        text-transform: none;
+        letter-spacing: 0;
+      }
+
+      .panel__badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 99px;
+        background: rgba(88, 166, 255, 0.12);
+        color: var(--blue);
+        border: 1px solid rgba(88, 166, 255, 0.25);
+      }
+
+      .panel__badge--green {
+        background: rgba(63, 185, 80, 0.12);
+        color: var(--green);
+        border-color: rgba(63, 185, 80, 0.25);
+      }
+
+      /* ── 6. GRID DE REGIÕES ─────────────────────────────────── */
+      .regioes-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--gap-md);
+        padding: var(--gap-md) 1.25rem;
+      }
+
+      .regiao-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        text-align: center;
+        cursor: default;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .regiao-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: var(--green);
+        transition: var(--transition);
+      }
+
+      .regiao-card.status--normal  { border-color: var(--border); }
+      .regiao-card.status--normal::before { background: var(--green); }
+
+      .regiao-card.status--critico {
+        border-color: var(--red-dim);
+        background: rgba(248, 81, 73, 0.07);
+        box-shadow: 0 0 16px var(--red-glow);
+        animation: pulso-critico 1.5s ease-in-out infinite;
+      }
+      .regiao-card.status--critico::before { background: var(--red); }
+
+      .regiao-card.status--irrigando {
+        border-color: var(--blue-dim);
+        background: rgba(88, 166, 255, 0.07);
+        box-shadow: 0 0 16px var(--blue-glow);
+        animation: pulso-irrigando 0.8s ease-in-out infinite;
+      }
+      .regiao-card.status--irrigando::before { background: var(--blue); }
+
+      @keyframes pulso-critico {
+        0%, 100% { box-shadow: 0 0 10px var(--red-glow); }
+        50%       { box-shadow: 0 0 22px rgba(248, 81, 73, 0.55); }
+      }
+
+      @keyframes pulso-irrigando {
+        0%, 100% { box-shadow: 0 0 10px var(--blue-glow); }
+        50%       { box-shadow: 0 0 22px rgba(88, 166, 255, 0.55); }
+      }
+
+      .regiao-card__icon {
+        font-size: 1.6rem;
+        margin-bottom: 0.5rem;
+        display: block;
+        transition: var(--transition);
+      }
+
+      .status--normal    .regiao-card__icon { color: var(--green); }
+      .status--critico   .regiao-card__icon { color: var(--red);   }
+      .status--irrigando .regiao-card__icon { color: var(--blue);  }
+
+      .regiao-card__nome {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: block;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .regiao-card__status-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 99px;
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      .status--normal    .regiao-card__status-label { background: rgba(63,185,80,0.15);  color: var(--green); }
+      .status--critico   .regiao-card__status-label { background: rgba(248,81,73,0.15);  color: var(--red);   }
+      .status--irrigando .regiao-card__status-label { background: rgba(88,166,255,0.15); color: var(--blue);  }
+
+      .regiao-card__temp {
+        font-size: 0.7rem;
+        font-family: var(--font-mono);
+        color: var(--text-secondary);
+        margin-top: 5px;
+        display: block;
+      }
+
+      /* ── 7. FORMULÁRIO DE CONTROLE ──────────────────────────── */
+      .control-form {
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--gap-md);
+        margin-bottom: var(--gap-md);
+      }
+
+      .form-row:last-child { margin-bottom: 0; }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .form-group--center { justify-content: flex-end; }
+
+      .form-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .form-label i { color: var(--blue); }
+
+      .form-control {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        padding: 0.6rem 0.85rem;
+        font-size: 0.88rem;
+        font-family: var(--font-main);
+        width: 100%;
+        transition: var(--transition);
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+      }
+
+      .form-control:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+      }
+
+      .form-control option { background: var(--bg-card); }
+
+      /* ── 8. BOTÕES ──────────────────────────────────────────── */
+      .actions-row {
+        display: flex;
+        gap: var(--gap-md);
+        padding: 1rem 1.25rem;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.7rem 1.25rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.85rem;
+        font-weight: 600;
+        font-family: var(--font-main);
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: var(--transition);
+        white-space: nowrap;
+        text-decoration: none;
+        outline: none;
+        letter-spacing: 0.2px;
+      }
+
+      .btn--primary {
+        background: var(--blue-dim);
+        border-color: var(--blue);
+        color: #fff;
+      }
+      .btn--primary:hover {
+        background: #2d78d3;
+        box-shadow: 0 0 14px var(--blue-glow);
+        transform: translateY(-1px);
+      }
+      .btn--primary:active { transform: translateY(0); }
+
+      .btn--danger {
+        background: var(--red-dim);
+        border-color: var(--red);
+        color: #fff;
+        width: 100%;
+        justify-content: center;
+      }
+      .btn--danger:hover {
+        background: #c0302e;
+        box-shadow: 0 0 14px var(--red-glow);
+        transform: translateY(-1px);
+      }
+      .btn--danger:active { transform: translateY(0); }
+
+      .btn--ghost {
+        background: transparent;
+        border-color: var(--border);
+        color: var(--text-secondary);
+      }
+      .btn--ghost:hover {
+        background: var(--bg-card);
+        color: var(--text-primary);
+        border-color: var(--border-light);
+      }
+
+      /* ── 9. FEEDBACK BOX ────────────────────────────────────── */
+      .feedback-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin: 0 1.25rem 1.1rem;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.83rem;
+        border: 1px solid;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .feedback--success { background: rgba(63,185,80,0.10);  border-color: rgba(63,185,80,0.30);  color: var(--green);  }
+      .feedback--info    { background: rgba(88,166,255,0.10); border-color: rgba(88,166,255,0.30); color: var(--blue);   }
+      .feedback--warning { background: rgba(227,179,65,0.10); border-color: rgba(227,179,65,0.30); color: var(--yellow); }
+      .feedback--error   { background: rgba(248,81,73,0.10);  border-color: rgba(248,81,73,0.30);  color: var(--red);    }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ── 10. FILA DE ALERTAS ────────────────────────────────── */
+      .queue-legend {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.6rem 1.25rem;
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      .queue-legend__item { font-weight: 600; letter-spacing: 0.3px; }
+      .queue-legend__item--front { color: var(--green); }
+      .queue-legend__item--back  { color: var(--yellow); }
+      .queue-legend__divider { color: var(--text-muted); flex: 1; text-align: center; }
+
+      .queue-size-badge {
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 99px;
+        background: rgba(227, 179, 65, 0.12);
+        color: var(--yellow);
+        border: 1px solid rgba(227, 179, 65, 0.3);
+        font-family: var(--font-mono);
+      }
+
+      .queue-container {
+        padding: 1rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-sm);
+        min-height: 120px;
+        max-height: 340px;
+        overflow-y: auto;
+      }
+
+      .queue-container::-webkit-scrollbar,
+      .historico-container::-webkit-scrollbar { width: 5px; }
+      .queue-container::-webkit-scrollbar-track,
+      .historico-container::-webkit-scrollbar-track { background: var(--bg-surface); }
+      .queue-container::-webkit-scrollbar-thumb,
+      .historico-container::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 99px; }
+
+      .alerta-card {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: var(--gap-md);
+        padding: 0.8rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        transition: var(--transition);
+        animation: slideIn 0.35s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .alerta-card::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 3px;
+        background: var(--red);
+      }
+
+      .alerta-card.alerta-card--first {
+        border-color: var(--green-dim);
+        background: rgba(63, 185, 80, 0.05);
+      }
+      .alerta-card.alerta-card--first::before { background: var(--green); }
+
+      .alerta-card__position {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        background: var(--bg-surface);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+
+      .alerta-card--first .alerta-card__position {
+        color: var(--green);
+        border-color: var(--green-dim);
+        background: rgba(63, 185, 80, 0.1);
+      }
+
+      .alerta-card__info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        overflow: hidden;
+      }
+
+      .alerta-card__regiao {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .alerta-card__meta {
+        display: flex;
+        gap: var(--gap-sm);
+        flex-wrap: wrap;
+      }
+
+      .alerta-card__tag {
+        font-size: 0.65rem;
+        font-family: var(--font-mono);
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+
+      .alerta-card__tag .tag-icon--fire  { color: var(--red);    }
+      .alerta-card__tag .tag-icon--smoke { color: var(--orange); }
+      .alerta-card__tag .tag-icon--clock { color: var(--text-muted); }
+
+      .alerta-card__id {
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+        align-self: flex-start;
+      }
+
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-12px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+
+      /* ── 11. ESTADO VAZIO ───────────────────────────────────── */
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 2.5rem 1rem;
+        color: var(--text-muted);
+        text-align: center;
+      }
+      .empty-state i { color: var(--text-muted); }
+      .empty-state p { font-size: 0.85rem; font-weight: 500; }
+      .empty-state small { font-size: 0.72rem; }
+
+      /* ── 12. HISTÓRICO ──────────────────────────────────────── */
+      .historico-container {
+        padding: 1rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-sm);
+        max-height: 320px;
+        overflow-y: auto;
+      }
+
+      .historico-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: var(--gap-md);
+        padding: 0.7rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        border-left: 3px solid var(--green);
+        animation: slideIn 0.35s ease;
+        opacity: 0.85;
+        transition: var(--transition);
+      }
+
+      .historico-item:hover {
+        opacity: 1;
+        background: var(--bg-card-hover);
+      }
+
+      .historico-item__icon {
+        font-size: 1.1rem;
+        color: var(--green);
+      }
+
+      .historico-item__info { overflow: hidden; }
+
+      .historico-item__regiao {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .historico-item__meta {
+        font-size: 0.67rem;
+        font-family: var(--font-mono);
+        color: var(--text-secondary);
+        margin-top: 2px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .historico-item__status-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 99px;
+        background: rgba(63, 185, 80, 0.12);
+        color: var(--green);
+        border: 1px solid rgba(63, 185, 80, 0.3);
+        white-space: nowrap;
+        align-self: flex-start;
+      }
+
+      /* ── 13. OVERLAY DE IRRIGAÇÃO ───────────────────────────── */
+      .irrigation-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.82);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+        backdrop-filter: blur(6px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s ease;
+      }
+
+      .irrigation-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .irrigation-overlay__box {
+        background: var(--bg-surface);
+        border: 1px solid var(--blue-dim);
+        border-radius: var(--radius-xl);
+        padding: 2.5rem 3rem;
+        text-align: center;
+        max-width: 420px;
+        width: 90%;
+        box-shadow: 0 0 60px rgba(88, 166, 255, 0.25);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .irrigation-anim {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .drop {
+        position: absolute;
+        top: -30px;
+        font-size: 1.3rem;
+        color: var(--blue);
+        opacity: 0;
+        animation: cair 2s ease-in infinite;
+      }
+
+      .drop1 { left: 10%;  animation-delay: 0s;   }
+      .drop2 { left: 30%;  animation-delay: 0.4s; }
+      .drop3 { left: 55%;  animation-delay: 0.8s; }
+      .drop4 { left: 72%;  animation-delay: 1.2s; }
+      .drop5 { left: 88%;  animation-delay: 0.2s; }
+
+      @keyframes cair {
+        0%   { top: -30px; opacity: 0; }
+        20%  { opacity: 0.9; }
+        100% { top: 110%; opacity: 0; }
+      }
+
+      .irrigation-overlay__icon {
+        font-size: 3rem;
+        color: var(--blue);
+        display: block;
+        margin-bottom: 1rem;
+        filter: drop-shadow(0 0 12px var(--blue));
+        position: relative;
+        z-index: 1;
+      }
+
+      .irrigation-overlay__title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .irrigation-overlay__desc {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .irrigation-overlay__bar {
+        height: 6px;
+        background: var(--bg-card);
+        border-radius: 99px;
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+      }
+
+      .irrigation-overlay__bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--blue-dim), var(--blue), #74c7ff);
+        border-radius: 99px;
+        transition: width 2.6s linear;
+      }
+
+      /* ── 14. RODAPÉ ─────────────────────────────────────────── */
+      .footer {
+        padding: 1rem var(--gap-xl);
+        border-top: 1px solid var(--border);
+        background: var(--bg-surface);
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        line-height: 1.8;
+      }
+
+      .footer i { color: var(--ods15); }
+
+      .footer__tech {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.4px;
+        margin-top: 2px;
+      }
+
+      /* ── 15. RESPONSIVIDADE ─────────────────────────────────── */
+      @media (max-width: 1024px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+          padding: var(--gap-md);
+        }
+        .stats-bar {
+          grid-template-columns: repeat(2, 1fr);
+          padding: var(--gap-md);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .topbar {
+          padding: 0.75rem 1rem;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .stats-bar {
+          grid-template-columns: 1fr 1fr;
+          gap: 0.5rem;
+        }
+        .main-grid {
+          padding: var(--gap-sm) 0.75rem;
+          gap: var(--gap-md);
+        }
+        .regioes-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        .actions-row {
+          flex-direction: column;
+        }
+        .actions-row .btn {
+          justify-content: center;
+        }
+        .queue-legend {
+          display: none;
+        }
+        .irrigation-overlay__box {
+          padding: 1.75rem 1.5rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- =====================================================
+         HEADER / TOPBAR
+         ===================================================== -->
+    <header class="topbar">
+      <div class="topbar__brand">
+        <div class="topbar__logo-wrap">
+          <i class="fa-solid fa-leaf"></i>
+        </div>
+        <div>
+          <span class="topbar__title">EcoGuard</span>
+          <span class="topbar__subtitle">Sistema de Monitoramento Ambiental &amp; Combate a Incêndios</span>
+        </div>
+      </div>
+
+      <div class="topbar__badges">
+        <span class="badge badge--ods badge--ods11">
+          <i class="fa-solid fa-city"></i> ODS 11
+        </span>
+        <span class="badge badge--ods badge--ods15">
+          <i class="fa-solid fa-tree"></i> ODS 15
+        </span>
+      </div>
+
+      <div class="topbar__clock">
+        <i class="fa-regular fa-clock"></i>
+        <span id="relogio">--:--:--</span>
+      </div>
+    </header>
+
+    <!-- =====================================================
+         FAIXA DE ESTATÍSTICAS GLOBAIS
+         ===================================================== -->
+    <section class="stats-bar">
+      <div class="stat-card">
+        <i class="fa-solid fa-map-location-dot stat-card__icon stat-card__icon--blue"></i>
+        <div>
+          <p class="stat-card__label">Regiões Monitoradas</p>
+          <p class="stat-card__value" id="stat-regioes">6</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fa-solid fa-triangle-exclamation stat-card__icon stat-card__icon--yellow"></i>
+        <div>
+          <p class="stat-card__label">Alertas na Fila</p>
+          <p class="stat-card__value" id="stat-fila">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fa-solid fa-fire stat-card__icon stat-card__icon--red"></i>
+        <div>
+          <p class="stat-card__label">Regiões Críticas</p>
+          <p class="stat-card__value" id="stat-criticas">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fa-solid fa-shield-halved stat-card__icon stat-card__icon--green"></i>
+        <div>
+          <p class="stat-card__label">Focos Combatidos</p>
+          <p class="stat-card__value" id="stat-combatidos">0</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         CONTEÚDO PRINCIPAL (GRID)
+         ===================================================== -->
+    <main class="main-grid">
+
+      <!-- ── COLUNA ESQUERDA ── -->
+      <div class="col-left">
+
+        <!-- PAINEL: REGIÕES MONITORADAS -->
+        <section class="panel">
+          <div class="panel__header">
+            <h2 class="panel__title">
+              <i class="fa-solid fa-satellite-dish"></i>
+              Regiões Monitoradas
+            </h2>
+            <span class="panel__badge" id="badge-regioes-ativas">6 ativas</span>
+          </div>
+          <div class="regioes-grid" id="regioes-grid">
+            <!-- Cards gerados dinamicamente pelo JavaScript -->
+          </div>
+        </section>
+
+        <!-- PAINEL: CENTRAL DE CONTROLE -->
+        <section class="panel">
+          <div class="panel__header">
+            <h2 class="panel__title">
+              <i class="fa-solid fa-sliders"></i>
+              Central de Controle
+            </h2>
+          </div>
+
+          <!-- Formulário de simulação -->
+          <div class="control-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="select-regiao">
+                  <i class="fa-solid fa-location-dot"></i> Região
+                </label>
+                <select id="select-regiao" class="form-control">
+                  <option value="">— Aleatório —</option>
+                  <option value="Norte">Norte</option>
+                  <option value="Sul">Sul</option>
+                  <option value="Leste">Leste</option>
+                  <option value="Oeste">Oeste</option>
+                  <option value="Central">Central</option>
+                  <option value="Serrana">Serrana</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="input-temp">
+                  <i class="fa-solid fa-temperature-high"></i> Temperatura (°C)
+                </label>
+                <input
+                  id="input-temp"
+                  type="number"
+                  class="form-control"
+                  placeholder="Auto (45–92°C)"
+                  min="30"
+                  max="95"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="select-fumaca">
+                  <i class="fa-solid fa-smog"></i> Nível de Fumaça
+                </label>
+                <select id="select-fumaca" class="form-control">
+                  <option value="">— Aleatório —</option>
+                  <option value="Baixo">Baixo</option>
+                  <option value="Moderado">Moderado</option>
+                  <option value="Alto">Alto</option>
+                  <option value="Crítico">Crítico</option>
+                </select>
+              </div>
+              <div class="form-group form-group--center">
+                <label class="form-label">&nbsp;</label>
+                <button class="btn btn--danger" id="btn-simular">
+                  <i class="fa-solid fa-bolt"></i>
+                  Simular Novo Alerta
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button class="btn btn--primary" id="btn-processar">
+              <i class="fa-solid fa-droplet"></i>
+              Atender Próximo Alerta (Processar Fila)
+            </button>
+            <button class="btn btn--ghost" id="btn-limpar-historico">
+              <i class="fa-solid fa-trash-can"></i>
+              Limpar Histórico
+            </button>
+          </div>
+
+          <!-- Mensagem de feedback das ações -->
+          <div class="feedback-box" id="feedback-box" style="display:none;">
+            <i class="fa-solid fa-circle-info"></i>
+            <span id="feedback-texto"></span>
+          </div>
+        </section>
+
+      </div><!-- /col-left -->
+
+      <!-- ── COLUNA DIREITA ── -->
+      <div class="col-right">
+
+        <!-- PAINEL: FILA DE ALERTAS -->
+        <section class="panel">
+          <div class="panel__header">
+            <h2 class="panel__title">
+              <i class="fa-solid fa-layer-group"></i>
+              Fila de Alertas
+              <span class="panel__subtitle">(Estrutura FIFO)</span>
+            </h2>
+            <span class="queue-size-badge" id="queue-size-badge">0 na fila</span>
+          </div>
+
+          <div class="queue-legend">
+            <span class="queue-legend__item queue-legend__item--front">
+              <i class="fa-solid fa-arrow-right-to-bracket"></i> INÍCIO (próximo a sair)
+            </span>
+            <span class="queue-legend__divider">···············</span>
+            <span class="queue-legend__item queue-legend__item--back">
+              FIM (último a entrar) <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </span>
+          </div>
+
+          <div class="queue-container" id="fila-container">
+            <div class="empty-state" id="fila-empty">
+              <i class="fa-solid fa-circle-check fa-2x"></i>
+              <p>Nenhum alerta na fila.</p>
+              <small>O sistema está operando normalmente.</small>
+            </div>
+          </div>
+        </section>
+
+        <!-- PAINEL: HISTÓRICO -->
+        <section class="panel">
+          <div class="panel__header">
+            <h2 class="panel__title">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              Histórico de Alertas Processados
+            </h2>
+            <span class="panel__badge panel__badge--green" id="badge-historico">0 registros</span>
+          </div>
+
+          <div class="historico-container" id="historico-container">
+            <div class="empty-state" id="historico-empty">
+              <i class="fa-solid fa-inbox fa-2x"></i>
+              <p>Nenhum alerta processado ainda.</p>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /col-right -->
+
+    </main>
+
+    <!-- =====================================================
+         RODAPÉ
+         ===================================================== -->
+    <footer class="footer">
+      <p>
+        <i class="fa-solid fa-leaf"></i>
+        EcoGuard &mdash; Projeto Interdisciplinar AEP &bull; ADS / Engenharia de Software &bull;
+        <strong>ODS 11 &amp; ODS 15</strong>
+      </p>
+      <p class="footer__tech">
+        HTML5 &bull; CSS3 (Flexbox/Grid) &bull; JavaScript Vanilla &bull; POO &bull; Estrutura de Dados (Fila/Queue FIFO)
+      </p>
+    </footer>
+
+    <!-- =====================================================
+         OVERLAY DE ANIMAÇÃO DE IRRIGAÇÃO
+         ===================================================== -->
+    <div class="irrigation-overlay" id="irrigation-overlay">
+      <div class="irrigation-overlay__box">
+        <div class="irrigation-anim">
+          <i class="fa-solid fa-droplet drop drop1"></i>
+          <i class="fa-solid fa-droplet drop drop2"></i>
+          <i class="fa-solid fa-droplet drop drop3"></i>
+          <i class="fa-solid fa-droplet drop drop4"></i>
+          <i class="fa-solid fa-droplet drop drop5"></i>
+        </div>
+        <i class="fa-solid fa-fire-extinguisher irrigation-overlay__icon"></i>
+        <h3 class="irrigation-overlay__title" id="overlay-title">Sistema de Irrigação Ativado!</h3>
+        <p class="irrigation-overlay__desc" id="overlay-desc">Combatendo foco na Região Norte...</p>
+        <div class="irrigation-overlay__bar">
+          <div class="irrigation-overlay__bar-fill" id="overlay-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================
+         JAVASCRIPT — Toda a lógica da aplicação
+         ===================================================== -->
+    <script>
+      /**
+       * ============================================================
+       *  script.js — EcoGuard: Painel de Monitoramento Ambiental
+       *  AEP – ADS / Engenharia de Software | ODS 11 & ODS 15
+       * ============================================================
+       *
+       *  CONCEITOS APLICADOS (para apresentação):
+       *  ─────────────────────────────────────────────────────────
+       *  1. POO — Programação Orientada a Objetos
+       *     • Classe `Alerta`      → representa um objeto de dado do domínio
+       *     • Classe `FilaAlertas` → encapsula a estrutura de dados Fila (Queue)
+       *     • Classe `EcoGuardApp` → controla toda a lógica da aplicação
+       *
+       *  2. ESTRUTURA DE DADOS — Fila (Queue) FIFO
+       *     • First In, First Out: o primeiro alerta inserido é o primeiro atendido
+       *     • Métodos clássicos: enqueue(), dequeue(), isEmpty(), size()
+       *     • Implementação manual usando array JavaScript (sem bibliotecas)
+       * ============================================================
+       */
+
+      "use strict";
+
+      /* ============================================================
+         BLOCO 1: MODELAGEM ORIENTADA A OBJETOS — Classe Alerta
+         ============================================================ */
+
+      /**
+       * ─────────────────────────────────────────────────────────────
+       *  CLASSE: Alerta
+       *  ─────────────────────────────────────────────────────────────
+       *  CONCEITO DE POO → Esta é a definição de uma "Classe" (molde).
+       *  Cada vez que detectamos um foco de incêndio, criamos uma nova
+       *  "instância" (objeto concreto) dessa classe com new Alerta(...).
+       *
+       *  Atributos: id, regiao, temperatura, fumaca, horario, status
+       *  Métodos:   toString()
+       * ─────────────────────────────────────────────────────────────
+       */
+      class Alerta {
+        /**
+         * Construtor: chamado automaticamente com `new Alerta(...)`
+         * @param {string} regiao      - Nome da região detectada
+         * @param {number} temperatura - Temperatura em °C
+         * @param {string} fumaca      - Nível de fumaça detectado
+         */
+        constructor(regiao, temperatura, fumaca) {
+          // ATRIBUTO id: identificador único — Date.now() + número aleatório
+          this.id = `ALT-${Date.now()}-${Math.floor(Math.random() * 900 + 100)}`;
+
+          // ATRIBUTO regiao: localização geográfica do sensor
+          this.regiao = regiao;
+
+          // ATRIBUTO temperatura: leitura do sensor térmico (graus Celsius)
+          this.temperatura = temperatura;
+
+          // ATRIBUTO fumaca: nível do sensor óptico de partículas
+          // Valores possíveis: "Baixo", "Moderado", "Alto", "Crítico"
+          this.fumaca = fumaca;
+
+          // ATRIBUTO horario: carimbo de data/hora da detecção (timestamp)
+          this.horario = new Date().toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          });
+
+          // ATRIBUTO status: ciclo de vida do alerta no sistema
+          // "Pendente" → aguardando na fila | "Irrigação Ativada" → processado
+          this.status = "Pendente";
+        }
+
+        /**
+         * MÉTODO toString(): representação textual do objeto (debug)
+         */
+        toString() {
+          return `[${this.id}] Região: ${this.regiao} | Temp: ${this.temperatura}°C | Fumaça: ${this.fumaca} | Status: ${this.status}`;
+        }
+      }
+
+
+      /* ============================================================
+         BLOCO 2: ESTRUTURA DE DADOS — Classe FilaAlertas (Queue FIFO)
+         ============================================================ */
+
+      /**
+       * ─────────────────────────────────────────────────────────────
+       *  CLASSE: FilaAlertas
+       *  ─────────────────────────────────────────────────────────────
+       *  CONCEITO DE ESTRUTURA DE DADOS:
+       *  Implementação manual de uma Fila (Queue) com disciplina FIFO:
+       *
+       *    FIFO = First In, First Out
+       *    → O PRIMEIRO alerta a entrar é o PRIMEIRO a ser atendido.
+       *    → Como uma fila de banco: quem chegou primeiro, sai primeiro.
+       *
+       *  Internamente usamos um Array como estrutura de armazenamento,
+       *  mas encapsulamos o acesso através dos métodos clássicos.
+       *
+       *  Métodos implementados:
+       *    enqueue(item) → Insere no FINAL  (push)
+       *    dequeue()     → Remove do INÍCIO (shift)
+       *    isEmpty()     → Verifica se está vazia
+       *    size()        → Quantidade de elementos
+       *    peek()        → Consulta o primeiro sem remover
+       *    getAll()      → Retorna cópia de todos os elementos
+       * ─────────────────────────────────────────────────────────────
+       */
+      class FilaAlertas {
+        constructor() {
+          // Array interno — armazenamento dos alertas na ordem de chegada
+          // Prefixo "_" indica uso interno (convenção de encapsulamento)
+          this._dados = [];
+        }
+
+        /**
+         * MÉTODO enqueue(alerta) — Inserir no FINAL da fila
+         * ─────────────────────────────────────────────────────────
+         * CONCEITO: Um novo alerta "entra no fim da fila de espera".
+         *
+         * Visualização:
+         *   Fila: [A, B, C]  →  enqueue(D)  →  [A, B, C, D]
+         *                                                   ↑ inserido aqui (fim)
+         */
+        enqueue(alerta) {
+          if (!(alerta instanceof Alerta)) {
+            throw new Error("FilaAlertas só aceita objetos do tipo Alerta.");
+          }
+          this._dados.push(alerta); // push() adiciona ao FINAL do array
+          console.log(`[FILA] enqueue() → "${alerta.id}" inserido no FINAL. Tamanho: ${this.size()}`);
+        }
+
+        /**
+         * MÉTODO dequeue() — Remover do INÍCIO da fila
+         * ─────────────────────────────────────────────────────────
+         * CONCEITO: O alerta mais antigo (primeiro da fila) é atendido.
+         *           Princípio FIFO: First In → First Out.
+         *
+         * Visualização:
+         *   Fila: [A, B, C, D]  →  dequeue()  →  retorna A  →  Fila: [B, C, D]
+         *          ↑ removido aqui (início)
+         *
+         * @returns {Alerta|null}
+         */
+        dequeue() {
+          if (this.isEmpty()) {
+            console.warn("[FILA] dequeue() → Fila vazia! Nada a remover.");
+            return null;
+          }
+          const alertaAtendido = this._dados.shift(); // shift() remove o PRIMEIRO elemento
+          console.log(`[FILA] dequeue() → "${alertaAtendido.id}" removido do INÍCIO. Restam: ${this.size()}`);
+          return alertaAtendido;
+        }
+
+        /**
+         * MÉTODO isEmpty() — Verifica se a fila está vazia
+         * @returns {boolean} true se vazia, false se tem elementos
+         */
+        isEmpty() {
+          return this._dados.length === 0;
+        }
+
+        /**
+         * MÉTODO size() — Retorna o número de elementos na fila
+         * @returns {number}
+         */
+        size() {
+          return this._dados.length;
+        }
+
+        /**
+         * MÉTODO peek() — Consulta o primeiro elemento sem removê-lo
+         * Útil para saber quem será o próximo atendido sem alterar a fila.
+         * @returns {Alerta|null}
+         */
+        peek() {
+          if (this.isEmpty()) return null;
+          return this._dados[0];
+        }
+
+        /**
+         * MÉTODO getAll() — Retorna cópia de todos os elementos
+         * Usa spread [...] para não expor o array interno diretamente.
+         * @returns {Alerta[]}
+         */
+        getAll() {
+          return [...this._dados];
+        }
+      }
+
+
+      /* ============================================================
+         BLOCO 3: CONTROLADOR DA APLICAÇÃO — Classe EcoGuardApp
+         ============================================================ */
+
+      /**
+       * ─────────────────────────────────────────────────────────────
+       *  CLASSE: EcoGuardApp (Controlador / Controller)
+       *  ─────────────────────────────────────────────────────────────
+       *  CONCEITO DE POO → Padrão "Controller".
+       *  Orquestra toda a lógica: gerencia regiões, usa a FilaAlertas,
+       *  atualiza a interface (DOM) e responde a eventos do usuário.
+       *
+       *  Princípios aplicados:
+       *    • Encapsulamento: dados e métodos juntos na mesma classe
+       *    • Composição:     EcoGuardApp "tem uma" FilaAlertas
+       *    • Responsabilidade única: cada método faz uma coisa só
+       * ─────────────────────────────────────────────────────────────
+       */
+      class EcoGuardApp {
+
+        constructor() {
+
+          // ── POO: Composição ──────────────────────────────────────
+          // EcoGuardApp "tem uma" FilaAlertas (relação de composição)
+          this.filaAlertas = new FilaAlertas();
+
+          // Array simples para o histórico (sem regra FIFO, apenas exibição)
+          this.historico = [];
+
+          // Mapa de regiões: chave = nome, valor = objeto com dados da região
+          this.regioes = {
+            Norte:   { nome: "Norte",   status: "normal", icone: "fa-mountain",            temperatura: 28 },
+            Sul:     { nome: "Sul",     status: "normal", icone: "fa-water",                temperatura: 24 },
+            Leste:   { nome: "Leste",   status: "normal", icone: "fa-sun",                  temperatura: 31 },
+            Oeste:   { nome: "Oeste",   status: "normal", icone: "fa-wind",                 temperatura: 26 },
+            Central: { nome: "Central", status: "normal", icone: "fa-city",                 temperatura: 29 },
+            Serrana: { nome: "Serrana", status: "normal", icone: "fa-cloud-showers-heavy",  temperatura: 22 },
+          };
+
+          this.totalCombatidos    = 0;     // Contador de focos combatidos
+          this.processandoAnimacao = false; // Flag para travar duplo clique
+
+          // Inicia a aplicação
+          this._iniciar();
+        }
+
+        /**
+         * MÉTODO PRIVADO _iniciar()
+         * Ponto de entrada: renderiza UI, vincula eventos, inicia relógio.
+         */
+        _iniciar() {
+          this._renderizarRegioes();
+          this._atualizarUI();
+          this._vincularEventos();
+          this._iniciarRelogio();
+
+          // Insere alertas de demonstração após 1.5s (para a apresentação)
+          setTimeout(() => this._simularAlertaDemonstracao(), 1500);
+
+          console.log("[APP] EcoGuard iniciado!");
+        }
+
+        /**
+         * MÉTODO PRIVADO _vincularEventos()
+         * Registra os Event Listeners dos botões da interface.
+         */
+        _vincularEventos() {
+          document.getElementById("btn-simular")
+            .addEventListener("click", () => this._aoClicarSimular());
+
+          document.getElementById("btn-processar")
+            .addEventListener("click", () => this._aoClicarProcessar());
+
+          document.getElementById("btn-limpar-historico")
+            .addEventListener("click", () => this._limparHistorico());
+        }
+
+        /* ────────────────────────────────────────────────────────
+           AÇÕES DOS BOTÕES
+           ──────────────────────────────────────────────────────── */
+
+        /**
+         * MÉTODO _aoClicarSimular()
+         * ─────────────────────────────────────────────────────────
+         * Executado ao clicar em "Simular Novo Alerta de Sensor".
+         *
+         * FLUXO (POO + Fila em ação):
+         *  1. Lê formulário ou gera dados aleatórios
+         *  2. POO: cria instância da classe Alerta com "new Alerta(...)"
+         *  3. FILA: insere no fim com filaAlertas.enqueue(alerta)
+         *  4. Atualiza status da região para "crítico"
+         *  5. Atualiza a interface
+         */
+        _aoClicarSimular() {
+          const selectRegiao = document.getElementById("select-regiao").value;
+          const inputTemp    = document.getElementById("input-temp").value;
+          const selectFumaca = document.getElementById("select-fumaca").value;
+
+          // Usa os valores do formulário ou gera aleatoriamente
+          const regiao     = selectRegiao || this._regiaoAleatoria();
+          const temperatura = inputTemp ? parseInt(inputTemp, 10) : this._temperaturaAleatoria();
+          const fumaca     = selectFumaca || this._fumacaAleatoria();
+
+          // ── POO em ação: instanciando a classe Alerta ────────────
+          // "new Alerta(...)" chama o construtor da classe e retorna
+          // um objeto concreto com todos os atributos preenchidos.
+          const novoAlerta = new Alerta(regiao, temperatura, fumaca);
+          // ────────────────────────────────────────────────────────
+
+          // ── ESTRUTURA DE DADOS: enqueue() ───────────────────────
+          // Insere o novo alerta no FINAL da fila.
+          // Princípio FIFO: ele só sairá após todos os que já estavam.
+          this.filaAlertas.enqueue(novoAlerta);
+          // ────────────────────────────────────────────────────────
+
+          // Marca a região como crítica visualmente
+          this._atualizarStatusRegiao(regiao, "critico", temperatura);
+
+          // Atualiza todos os painéis da interface
+          this._atualizarUI();
+          this._mostrarFeedback(
+            `🔥 Alerta <strong>${novoAlerta.id}</strong> gerado na Região <strong>${regiao}</strong>! Temperatura: ${temperatura}°C | Fumaça: ${fumaca}. Inserido na fila.`,
+            "warning"
+          );
+
+          // Limpa o formulário
+          document.getElementById("select-regiao").value = "";
+          document.getElementById("input-temp").value    = "";
+          document.getElementById("select-fumaca").value = "";
+
+          console.log(`[APP] Simulado: ${novoAlerta.toString()}`);
+        }
+
+        /**
+         * MÉTODO _aoClicarProcessar()
+         * ─────────────────────────────────────────────────────────
+         * Executado ao clicar em "Atender Próximo Alerta (Processar Fila)".
+         *
+         * FLUXO (POO + Fila em ação):
+         *  1. FILA: verifica se está vazia com isEmpty()
+         *  2. FILA: remove o PRIMEIRO alerta com dequeue() (FIFO)
+         *  3. POO: modifica o atributo status do objeto Alerta
+         *  4. Exibe animação de irrigação
+         *  5. Move o alerta ao histórico e atualiza a UI
+         */
+        _aoClicarProcessar() {
+          if (this.processandoAnimacao) {
+            this._mostrarFeedback("⏳ Aguarde o sistema de irrigação concluir...", "info");
+            return;
+          }
+
+          // ── ESTRUTURA DE DADOS: isEmpty() ───────────────────────
+          // Antes de tentar dequeue, verificamos se a fila está vazia.
+          if (this.filaAlertas.isEmpty()) {
+            this._mostrarFeedback("✅ Nenhum alerta pendente na fila. Sistema operando normalmente.", "success");
+            return;
+          }
+
+          // ── ESTRUTURA DE DADOS: dequeue() ───────────────────────
+          // Remove e retorna o PRIMEIRO alerta da fila (FIFO).
+          // Este é o alerta mais antigo, que esperou mais tempo.
+          const alertaAtendido = this.filaAlertas.dequeue();
+          // ────────────────────────────────────────────────────────
+
+          // ── POO em ação: modificando atributo do objeto ──────────
+          // Atualizamos a propriedade "status" do objeto Alerta
+          alertaAtendido.status = "Irrigação Ativada";
+          // ────────────────────────────────────────────────────────
+
+          // Exibe animação e processa após término
+          this._animarIrrigacao(alertaAtendido, () => {
+            // Insere no início do histórico (mais recente primeiro)
+            this.historico.unshift(alertaAtendido);
+            this.totalCombatidos++;
+
+            // Verifica se há mais alertas da mesma região na fila
+            const alertasRestantesDaRegiao = this.filaAlertas
+              .getAll()
+              .filter((a) => a.regiao === alertaAtendido.regiao);
+
+            // Só normaliza a região se não houver mais alertas dela na fila
+            if (alertasRestantesDaRegiao.length === 0) {
+              this._atualizarStatusRegiao(alertaAtendido.regiao, "normal");
+            }
+
+            this._atualizarUI();
+            this._renderizarFila();
+            this._renderizarHistorico();
+            this._mostrarFeedback(
+              `💧 Irrigação concluída! Foco na Região <strong>${alertaAtendido.regiao}</strong> combatido com sucesso. Alerta <strong>${alertaAtendido.id}</strong> movido ao histórico.`,
+              "success"
+            );
+
+            console.log(`[APP] Processado: ${alertaAtendido.toString()}`);
+          });
+        }
+
+        /* ────────────────────────────────────────────────────────
+           ANIMAÇÃO DE IRRIGAÇÃO
+           ──────────────────────────────────────────────────────── */
+
+        /**
+         * MÉTODO _animarIrrigacao(alerta, callback)
+         * Exibe o overlay de irrigação por ~2.8s e chama o callback.
+         */
+        _animarIrrigacao(alerta, callback) {
+          this.processandoAnimacao = true;
+
+          // Muda status visual para "irrigando" durante a animação
+          this._atualizarStatusRegiao(alerta.regiao, "irrigando");
+          this._renderizarRegioes();
+          this._renderizarFila();
+
+          // Configura o texto do overlay
+          document.getElementById("overlay-title").textContent = "Sistema de Irrigação Ativado!";
+          document.getElementById("overlay-desc").textContent  =
+            `Combatendo foco na Região ${alerta.regiao}... (${alerta.temperatura}°C | Fumaça: ${alerta.fumaca})`;
+
+          // Exibe o overlay
+          const overlay = document.getElementById("irrigation-overlay");
+          overlay.classList.add("active");
+
+          // Anima a barra de progresso
+          const barFill = document.getElementById("overlay-bar");
+          barFill.style.width = "0%";
+          barFill.offsetHeight; // força reflow para reiniciar a transição CSS
+          barFill.style.width  = "100%";
+
+          // Após 2.8 segundos: fecha overlay e executa o callback
+          setTimeout(() => {
+            overlay.classList.remove("active");
+            barFill.style.width = "0%";
+            this.processandoAnimacao = false;
+            if (typeof callback === "function") callback();
+          }, 2800);
+        }
+
+        /* ────────────────────────────────────────────────────────
+           GERENCIAMENTO DE REGIÕES
+           ──────────────────────────────────────────────────────── */
+
+        /** Atualiza status de uma região e re-renderiza os cards */
+        _atualizarStatusRegiao(nomeRegiao, novoStatus, temperatura = null) {
+          if (this.regioes[nomeRegiao]) {
+            this.regioes[nomeRegiao].status = novoStatus;
+            if (temperatura !== null) this.regioes[nomeRegiao].temperatura = temperatura;
+          }
+          this._renderizarRegioes();
+        }
+
+        /* ────────────────────────────────────────────────────────
+           RENDERIZAÇÃO DO DOM
+           ──────────────────────────────────────────────────────── */
+
+        /**
+         * MÉTODO _renderizarRegioes()
+         * Gera dinamicamente os cards de regiões, aplicando
+         * classes CSS conforme o status atual de cada região.
+         */
+        _renderizarRegioes() {
+          const container = document.getElementById("regioes-grid");
+          container.innerHTML = "";
+
+          const labelMap = {
+            normal:    "Normal",
+            critico:   "⚠ Crítico",
+            irrigando: "💧 Irrigando",
+          };
+          const iconeMap = {
+            normal:    "fa-shield-halved",
+            critico:   "fa-fire",
+            irrigando: "fa-droplet",
+          };
+
+          for (const chave in this.regioes) {
+            const regiao = this.regioes[chave];
+            const label  = labelMap[regiao.status] || regiao.status;
+            const icone  = iconeMap[regiao.status]  || "fa-question";
+
+            const card = document.createElement("div");
+            card.className = `regiao-card status--${regiao.status}`;
+            card.setAttribute("data-regiao", chave);
+            card.setAttribute("title", `Região ${regiao.nome} — Status: ${label}`);
+
+            card.innerHTML = `
+              <i class="fa-solid ${icone} regiao-card__icon"></i>
+              <span class="regiao-card__nome">${regiao.nome}</span>
+              <span class="regiao-card__status-label">${label}</span>
+              <span class="regiao-card__temp">
+                <i class="fa-solid fa-temperature-half"></i> ${regiao.temperatura}°C
+              </span>
+            `;
+
+            container.appendChild(card);
+          }
+        }
+
+        /**
+         * MÉTODO _renderizarFila()
+         * Re-renderiza o painel de Fila na ordem FIFO correta.
+         * Usa getAll() para obter os elementos sem modificar a fila.
+         */
+        _renderizarFila() {
+          const container    = document.getElementById("fila-container");
+          const emptyState   = document.getElementById("fila-empty");
+          const badgeTamanho = document.getElementById("queue-size-badge");
+
+          // getAll() retorna cópia do array interno sem alterar a fila
+          const alertas = this.filaAlertas.getAll();
+          badgeTamanho.textContent = `${alertas.length} na fila`;
+
+          container.innerHTML = "";
+          container.appendChild(emptyState);
+
+          if (alertas.length === 0) {
+            emptyState.style.display = "flex";
+          } else {
+            emptyState.style.display = "none";
+
+            alertas.forEach((alerta, indice) => {
+              const isFirst = indice === 0; // índice 0 = primeiro a sair (FIFO)
+
+              const card = document.createElement("div");
+              card.className = `alerta-card${isFirst ? " alerta-card--first" : ""}`;
+              card.setAttribute("data-id", alerta.id);
+
+              card.innerHTML = `
+                <div class="alerta-card__position"
+                     title="${isFirst ? "Próximo a ser atendido (FIFO)" : `Posição ${indice + 1}`}">
+                  ${isFirst ? "<i class='fa-solid fa-play' style='font-size:0.6rem'></i>" : indice + 1}
+                </div>
+                <div class="alerta-card__info">
+                  <span class="alerta-card__regiao">
+                    <i class="fa-solid fa-location-dot" style="color:var(--red)"></i>
+                    Região ${alerta.regiao}
+                  </span>
+                  <div class="alerta-card__meta">
+                    <span class="alerta-card__tag">
+                      <i class="fa-solid fa-fire tag-icon--fire"></i>
+                      ${alerta.temperatura}°C
+                    </span>
+                    <span class="alerta-card__tag">
+                      <i class="fa-solid fa-smog tag-icon--smoke"></i>
+                      ${alerta.fumaca}
+                    </span>
+                    <span class="alerta-card__tag">
+                      <i class="fa-regular fa-clock tag-icon--clock"></i>
+                      ${alerta.horario}
+                    </span>
+                  </div>
+                </div>
+                <span class="alerta-card__id">${alerta.id}</span>
+              `;
+
+              container.appendChild(card);
+            });
+          }
+        }
+
+        /**
+         * MÉTODO _renderizarHistorico()
+         * Re-renderiza o painel de Histórico de alertas processados.
+         */
+        _renderizarHistorico() {
+          const container  = document.getElementById("historico-container");
+          const emptyState = document.getElementById("historico-empty");
+          const badgeCount = document.getElementById("badge-historico");
+
+          badgeCount.textContent = `${this.historico.length} registro${this.historico.length !== 1 ? "s" : ""}`;
+
+          container.innerHTML = "";
+          container.appendChild(emptyState);
+
+          if (this.historico.length === 0) {
+            emptyState.style.display = "flex";
+          } else {
+            emptyState.style.display = "none";
+
+            this.historico.forEach((alerta) => {
+              const item = document.createElement("div");
+              item.className = "historico-item";
+
+              item.innerHTML = `
+                <i class="fa-solid fa-circle-check historico-item__icon"></i>
+                <div class="historico-item__info">
+                  <span class="historico-item__regiao">Região ${alerta.regiao}</span>
+                  <div class="historico-item__meta">
+                    <span><i class="fa-solid fa-fire" style="color:var(--red)"></i> ${alerta.temperatura}°C</span>
+                    <span><i class="fa-solid fa-smog" style="color:var(--orange)"></i> ${alerta.fumaca}</span>
+                    <span><i class="fa-regular fa-clock"></i> ${alerta.horario}</span>
+                    <span style="color:var(--text-muted);font-size:0.6rem">${alerta.id}</span>
+                  </div>
+                </div>
+                <span class="historico-item__status-badge">
+                  <i class="fa-solid fa-droplet"></i> Combatido
+                </span>
+              `;
+
+              container.appendChild(item);
+            });
+          }
+        }
+
+        /**
+         * MÉTODO _atualizarUI()
+         * Sincroniza os contadores e re-renderiza todos os painéis.
+         */
+        _atualizarUI() {
+          const criticas = Object.values(this.regioes)
+            .filter((r) => r.status === "critico" || r.status === "irrigando")
+            .length;
+
+          document.getElementById("stat-fila").textContent       = this.filaAlertas.size();
+          document.getElementById("stat-criticas").textContent   = criticas;
+          document.getElementById("stat-combatidos").textContent = this.totalCombatidos;
+
+          this._renderizarRegioes();
+          this._renderizarFila();
+          this._renderizarHistorico();
+        }
+
+        /* ────────────────────────────────────────────────────────
+           FEEDBACK VISUAL
+           ──────────────────────────────────────────────────────── */
+
+        /**
+         * MÉTODO _mostrarFeedback(mensagem, tipo)
+         * Exibe mensagem contextual ao usuário por 5 segundos.
+         * @param {string} mensagem - HTML da mensagem
+         * @param {string} tipo     - "success" | "info" | "warning" | "error"
+         */
+        _mostrarFeedback(mensagem, tipo = "info") {
+          const box   = document.getElementById("feedback-box");
+          const texto = document.getElementById("feedback-texto");
+
+          const icones = {
+            success: "fa-circle-check",
+            info:    "fa-circle-info",
+            warning: "fa-triangle-exclamation",
+            error:   "fa-circle-xmark",
+          };
+
+          box.className = `feedback-box feedback--${tipo}`;
+          texto.innerHTML = mensagem;
+          box.querySelector("i").className = `fa-solid ${icones[tipo] || "fa-circle-info"}`;
+          box.style.display = "flex";
+
+          clearTimeout(this._feedbackTimeout);
+          this._feedbackTimeout = setTimeout(() => {
+            box.style.display = "none";
+          }, 5000);
+        }
+
+        /* ────────────────────────────────────────────────────────
+           UTILITÁRIOS DE GERAÇÃO ALEATÓRIA
+           ──────────────────────────────────────────────────────── */
+
+        _regiaoAleatoria() {
+          const regioes = Object.keys(this.regioes);
+          return regioes[Math.floor(Math.random() * regioes.length)];
+        }
+
+        _temperaturaAleatoria() {
+          return Math.floor(Math.random() * (92 - 45 + 1)) + 45;
+        }
+
+        _fumacaAleatoria() {
+          const niveis = ["Moderado", "Alto", "Alto", "Crítico", "Crítico"];
+          return niveis[Math.floor(Math.random() * niveis.length)];
+        }
+
+        /* ────────────────────────────────────────────────────────
+           RELÓGIO EM TEMPO REAL
+           ──────────────────────────────────────────────────────── */
+
+        _iniciarRelogio() {
+          const atualizar = () => {
+            document.getElementById("relogio").textContent =
+              new Date().toLocaleTimeString("pt-BR");
+          };
+          atualizar();
+          setInterval(atualizar, 1000);
+        }
+
+        /* ────────────────────────────────────────────────────────
+           DEMONSTRAÇÃO INICIAL
+           ──────────────────────────────────────────────────────── */
+
+        /**
+         * Insere alertas de demonstração para popular a fila
+         * automaticamente quando a página é carregada.
+         */
+        _simularAlertaDemonstracao() {
+          // Alerta 1: Região Norte — temperatura crítica
+          const alerta1 = new Alerta("Norte", 78, "Crítico");
+          this.filaAlertas.enqueue(alerta1);
+          this._atualizarStatusRegiao("Norte", "critico", 78);
+
+          // 600ms depois: insere o segundo alerta
+          setTimeout(() => {
+            const alerta2 = new Alerta("Serrana", 65, "Alto");
+            this.filaAlertas.enqueue(alerta2);
+            this._atualizarStatusRegiao("Serrana", "critico", 65);
+
+            this._atualizarUI();
+            this._mostrarFeedback(
+              "📡 Sistema iniciado! <strong>2 alertas de demonstração</strong> inseridos na fila. Clique em <em>Atender Próximo Alerta</em> para processar.",
+              "info"
+            );
+          }, 600);
+        }
+
+        /* ────────────────────────────────────────────────────────
+           LIMPAR HISTÓRICO
+           ──────────────────────────────────────────────────────── */
+
+        _limparHistorico() {
+          if (this.historico.length === 0) {
+            this._mostrarFeedback("O histórico já está vazio.", "info");
+            return;
+          }
+          const qtd = this.historico.length;
+          this.historico = [];
+          this._renderizarHistorico();
+          this._mostrarFeedback(`🗑️ Histórico limpo. ${qtd} registro(s) removido(s).`, "info");
+        }
+      }
+
+
+      /* ============================================================
+         BLOCO 4: INICIALIZAÇÃO DA APLICAÇÃO
+         ============================================================ */
+
+      /**
+       * Aguarda o DOM estar completamente carregado antes de
+       * instanciar o controlador principal da aplicação.
+       *
+       * CONCEITO POO: "new EcoGuardApp()" cria o único objeto
+       * controlador que gerencia toda a aplicação.
+       *
+       * DOMContentLoaded garante que todos os elementos HTML
+       * existem antes de o JavaScript tentar acessá-los.
+       */
+      document.addEventListener("DOMContentLoaded", () => {
+
+        // ── POO em ação: instanciando o controlador principal ──────
+        const app = new EcoGuardApp();
+        // ──────────────────────────────────────────────────────────
+
+        // Expõe no console para inspeção e debug durante apresentação
+        window.ecoGuard = app;
+
+        console.log(
+          "%c EcoGuard iniciado! ",
+          "background:#3fb950;color:#0d1117;font-weight:bold;font-size:14px;padding:4px 8px;border-radius:4px;"
+        );
+        console.log(
+          "%c Dica: inspecione window.ecoGuard.filaAlertas no console para explorar a estrutura de dados!",
+          "color:#58a6ff;font-size:12px;"
+        );
+        console.log(
+          "%c Experimente: window.ecoGuard.filaAlertas.size() | .peek() | .getAll()",
+          "color:#e3b341;font-size:12px;"
+        );
+      });
+    </script>
+  </body>
+</html>
