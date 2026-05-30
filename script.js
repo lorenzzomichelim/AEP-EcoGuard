@@ -4,7 +4,7 @@
  *  AEP – ADS / Engenharia de Software | ODS 11 & ODS 15
  * ============================================================
  *
- *  CONCEITOS APLICADOS (para apresentação):
+ *  CONCEITOS APLICADOS:
  *  ─────────────────────────────────────────────────────────
  *  1. POO — Programação Orientada a Objetos
  *     • Classe `Alerta`      → representa um objeto de dado do domínio
